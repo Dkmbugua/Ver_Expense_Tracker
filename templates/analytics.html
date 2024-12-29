@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Analytics</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <h1>Financial Analytics</h1>
+    <div id="chart"></div>
+
+    <script>
+        var expenses = {{ expenses | tojson }};
+        var incomes = {{ incomes | tojson }};
+
+        var data = [
+            { x: Array.from(Array(expenses.length).keys()), y: expenses, type: 'bar', name: 'Expenses' },
+            { x: Array.from(Array(incomes.length).keys()), y: incomes, type: 'bar', name: 'Incomes' }
+        ];
+
+        var layout = {
+            title: 'Expenses and Incomes',
+            xaxis: { title: 'Entries' },
+            yaxis: { title: 'Amount' }
+        };
+
+        Plotly.newPlot('chart', data, layout);
+    </script>
+    <a href="/">Back to Home</a>
+</body>
+</html>

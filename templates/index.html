@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Expense Tracker</title>
+    <!-- Linking the external CSS file -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h1>Welcome to Expense Tracker</h1>
+
+    <!-- Flash Messages for Notifications -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <p class="{{ category }}">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Profile Section -->
+    <div class="profile-section">
+        <h2>Profile</h2>
+        {% if profile %}
+            <p><strong>Name:</strong> {{ profile[1] }}</p>
+            <p><strong>Age:</strong> {{ profile[2] }}</p>
+            <p><strong>Profession:</strong> {{ profile[3] }}</p>
+            <a href="/profile"><button>Edit Profile</button></a>
+        {% else %}
+            <p>No profile found. <a href="/profile"><button>Create Profile</button></a></p>
+        {% endif %}
+    </div>
+
+    <!-- Expenses Section -->
+    <div class="expenses-section">
+        <h2>Expenses</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense in expenses %}
+                <tr>
+                    <td>{{ expense[1] }}</td>
+                    <td>{{ expense[2] }}</td>
+                    <td>
+                        <a href="/edit_expense/{{ expense[0] }}"><button>Edit</button></a>
+                        <a href="/delete_expense/{{ expense[0] }}"><button>Delete</button></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <form action="/add_expense" method="POST">
+            <input type="number" name="amount" placeholder="Enter expense" required>
+            <button type="submit">Add Expense</button>
+        </form>
+    </div>
+
+    <!-- Incomes Section -->
+    <div class="incomes-section">
+        <h2>Incomes</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for income in incomes %}
+                <tr>
+                    <td>{{ income[1] }}</td>
+                    <td>{{ income[2] }}</td>
+                    <td>
+                        <a href="/edit_income/{{ income[0] }}"><button>Edit</button></a>
+                        <a href="/delete_income/{{ income[0] }}"><button>Delete</button></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <form action="/add_income" method="POST">
+            <input type="number" name="amount" placeholder="Enter income" required>
+            <button type="submit">Add Income</button>
+        </form>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="navigation-section">
+        <a href="/analytics"><button>View Analytics</button></a>
+        <a href="/advice"><button>Get Financial Advice</button></a>
+    </div>
+</body>
+</html>

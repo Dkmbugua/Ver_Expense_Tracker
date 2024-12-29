@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Income</title>
+</head>
+<body>
+    <h1>Edit Income</h1>
+    <form action="/edit_income/{{ income[0] }}" method="POST">
+        <input type="number" name="amount" value="{{ income[1] }}" required>
+        <button type="submit">Update Income</button>
+    </form>
+    <a href="/">Back to Home</a>
+</body>
+</html>
