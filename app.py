@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 import database as db  # Import the database functions
+import os
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"  # Needed for flash messages
@@ -102,4 +103,4 @@ def advice():
 
 # Run the app
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
