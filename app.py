@@ -127,11 +127,12 @@ def profile():
 @login_required
 def add_expense():
     amount = request.form['amount']
+    category = request.form.get('category', 'Uncategorized')
     if not amount:
         flash("Amount is required!", "danger")
         return redirect(url_for('index'))
-    db.insert_expense(float(amount), current_user.id)
-    flash("Expense added successfully!", "success")
+    db.insert_expense(float(amount), current_user.id, category)
+    flash(f"Expense added successfully under '{category}'!", "success")
     return redirect(url_for('index'))
 
 @app.route('/add_income', methods=['POST'])
@@ -199,10 +200,23 @@ def delete_income(income_id):
 @app.route('/analytics')
 @login_required
 def analytics():
+    # Fetch all expenses and incomes for the existing chart
     expenses = [e[1] for e in db.get_all_expenses(current_user.id)]
     incomes = [i[1] for i in db.get_all_incomes(current_user.id)]
-    return render_template('analytics.html', expenses=expenses, incomes=incomes)
 
+    # Fetch categorized expenses
+    categorized_expenses = db.get_expenses_grouped_by_category(current_user.id)
+    categories = list(categorized_expenses.keys())
+    expenses_by_category = list(categorized_expenses.values())
+
+    # Render the analytics page with both datasets
+    return render_template(
+        'analytics.html',
+        expenses=expenses,
+        incomes=incomes,
+        categories=categories,
+        categorized_expenses=expenses_by_category
+    )
 # Financial Advice
 @app.route('/advice')
 @login_required
@@ -214,6 +228,24 @@ def advice():
         else "Your expenses are higher than your income. Consider budgeting!"
     )
     return render_template('advice.html', advice=advice_message, total_income=total_income, total_expenses=total_expenses)
+
+#expense_summary
+@app.route('/expense_summary')
+@login_required
+def expense_summary():
+    # Fetch grouped expenses by category
+    grouped_expenses_dict = db.get_expenses_grouped_by_category(current_user.id)
+    
+    # Convert the dictionary to a list of tuples
+    grouped_expenses = [(category, total) for category, total in grouped_expenses_dict.items()]
+    
+    # Debugging
+    print("Grouped Expenses for Summary:", grouped_expenses)
+    
+    # Render the summary template
+    return render_template('expense_summary.html', grouped_expenses=grouped_expenses)
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))

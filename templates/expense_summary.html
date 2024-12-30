@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Expense Summary</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #f4f4f4;
+            color: #555;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        a {
+            display: block;
+            text-align: center;
+            margin: 20px auto;
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        #chart {
+            width: 80%;
+            margin: 0 auto 20px auto;
+        }
+    </style>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <h1>Expense Summary</h1>
+
+    <!-- Chart -->
+    <div id="chart"></div>
+
+    <!-- Table -->
+    <table>
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Total Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for category, total in grouped_expenses %}
+            <tr>
+                <td>{{ category }}</td>
+                <td>Ksh{{ "%.2f"|format(total) }}</td> <!-- Currency formatting -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="/">Back to Home</a>
+
+    <script>
+        // Data for Bar Chart
+        var categories = {{ grouped_expenses | map(attribute=0) | list | tojson }};
+        var totals = {{ grouped_expenses | map(attribute=1) | list | tojson }};
+
+        var data = [
+            {
+                x: categories,
+                y: totals,
+                type: 'bar',
+                marker: { color: '#007bff' },
+                text: totals.map((total, i) => `Category: ${categories[i]}<br>Total: $${total.toFixed(2)}`), // Tooltip text
+                hoverinfo: 'text' // Use the custom tooltip text
+            }
+        ];
+
+        var layout = {
+            title: 'Expenses by Category',
+            xaxis: { title: 'Categories' },
+            yaxis: { title: 'Total Amount' }
+        };
+
+        Plotly.newPlot('chart', data, layout);
+    </script>
+</body>
+</html>

@@ -29,16 +29,6 @@ def create_tables():
         )
     ''')
 
-    # Expenses table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS expenses (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            amount REAL NOT NULL,
-            user_id INTEGER NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id)
-        )
-    ''')
 
     # Incomes table
     cursor.execute('''
@@ -50,6 +40,18 @@ def create_tables():
             FOREIGN KEY (user_id) REFERENCES users(id)
         )
     ''')
+    # Add the category column to the expenses table
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS expenses (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        amount REAL NOT NULL,
+        category TEXT NOT NULL DEFAULT 'Other',
+        user_id INTEGER NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+''')
+
 
     conn.commit()
     conn.close()
@@ -120,10 +122,10 @@ def update_profile(user_id, name, age, profession):
     conn.close()
 
 # CRUD operations for expenses
-def insert_expense(amount, user_id):
+def insert_expense(amount, user_id, category='Uncategorized'):
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO expenses (amount, user_id) VALUES (?, ?)", (amount, user_id))
+    cursor.execute("INSERT INTO expenses (amount, user_id, category) VALUES (?, ?, ?)", (amount, user_id, category))
     conn.commit()
     conn.close()
 
@@ -194,6 +196,26 @@ def delete_income(income_id):
     cursor.execute("DELETE FROM incomes WHERE id = ?", (income_id,))
     conn.commit()
     conn.close()
+
+
+def get_expenses_grouped_by_category(user_id):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    # Fetch expenses grouped by category with their total amounts
+    cursor.execute("""
+        SELECT category, SUM(amount) 
+        FROM expenses 
+        WHERE user_id = ?
+        GROUP BY category
+    """, (user_id,))
+
+    grouped_expenses = cursor.fetchall()
+    conn.close()
+
+    # Convert the result into a dictionary {category: total_amount}
+    return {row[0]: row[1] for row in grouped_expenses}
+
 
 if __name__ == "__main__":
     create_tables()

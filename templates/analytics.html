@@ -3,28 +3,72 @@
 <head>
     <title>Analytics</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        .charts-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .chart {
+            width: 45%;
+        }
+    </style>
 </head>
 <body>
     <h1>Financial Analytics</h1>
-    <div id="chart"></div>
 
+    <!-- Container for the two charts -->
+    <div class="charts-container">
+        <!-- Chart for Expenses vs Incomes -->
+        <div id="chart-total" class="chart"></div>
+
+        <!-- Chart for Expenses by Category -->
+        <div id="chart-categories" class="chart"></div>
+    </div>
+
+    <!-- Script for the Charts -->
     <script>
+        // Data for the Total Expenses vs Incomes Chart
         var expenses = {{ expenses | tojson }};
         var incomes = {{ incomes | tojson }};
 
-        var data = [
+        var totalData = [
             { x: Array.from(Array(expenses.length).keys()), y: expenses, type: 'bar', name: 'Expenses' },
             { x: Array.from(Array(incomes.length).keys()), y: incomes, type: 'bar', name: 'Incomes' }
         ];
 
-        var layout = {
+        var totalLayout = {
             title: 'Expenses and Incomes',
             xaxis: { title: 'Entries' },
             yaxis: { title: 'Amount' }
         };
 
-        Plotly.newPlot('chart', data, layout);
+        Plotly.newPlot('chart-total', totalData, totalLayout);
+
+        // Data for the Expenses by Category Chart
+        var categories = {{ categories | tojson }};
+        var categoryExpenses = {{ categorized_expenses | tojson }};
+
+        var categoryData = [
+            {
+                x: categories,
+                y: categoryExpenses,
+                type: 'bar',
+                marker: { color: 'rgba(55, 128, 191, 0.6)' },
+                name: 'Expenses by Category'
+            }
+        ];
+
+        var categoryLayout = {
+            title: 'Expenses by Category',
+            xaxis: { title: 'Category' },
+            yaxis: { title: 'Amount' }
+        };
+
+        Plotly.newPlot('chart-categories', categoryData, categoryLayout);
     </script>
+
     <a href="/">Back to Home</a>
 </body>
 </html>
