@@ -1,16 +1,78 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #e0e0e0, #b3cde0);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <h1>Manage Your Profile</h1>
-    <form action="/profile" method="POST">
-        <input type="text" name="name" placeholder="Your Name" value="{{ profile[1] if profile else '' }}" required>
-        <input type="number" name="age" placeholder="Your Age" value="{{ profile[2] if profile else '' }}" required>
-        <input type="text" name="profession" placeholder="Your Profession" value="{{ profile[3] if profile else '' }}" required>
-        <button type="submit">Save Profile</button>
-    </form>
-    <a href="/">Back to Home</a>
+    <div class="container">
+        <h1>Manage Your Profile</h1>
+        <form action="/profile" method="POST">
+            <input type="text" name="name" placeholder="Your Name" value="{{ profile[1] if profile else '' }}" required>
+            <input type="number" name="age" placeholder="Your Age" value="{{ profile[2] if profile else '' }}" required>
+            <input type="text" name="profession" placeholder="Your Profession" value="{{ profile[3] if profile else '' }}" required>
+            <button type="submit">Save Profile</button>
+        </form>
+        <a href="/">Back to Home</a>
+    </div>
 </body>
 </html>
