@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 import database as db
 import os
+
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"  # Needed for flash messages
@@ -133,7 +134,7 @@ def add_expense():
         return redirect(url_for('index'))
     db.insert_expense(float(amount), current_user.id, category)
     flash(f"Expense added successfully under '{category}'!", "success")
-    return redirect(url_for('index'))
+    return redirect(url_for('analytics'))
 
 @app.route('/add_income', methods=['POST'])
 @login_required
@@ -195,39 +196,69 @@ def delete_income(income_id):
     db.delete_income(income_id)
     flash("Income deleted successfully!", "success")
     return redirect(url_for('index'))
-
-# Analytics
+#finance Analytics
 @app.route('/analytics')
 @login_required
 def analytics():
-    # Fetch all expenses and incomes for the existing chart
-    expenses = [e[1] for e in db.get_all_expenses(current_user.id)]
-    incomes = [i[1] for i in db.get_all_incomes(current_user.id)]
+    # Fetch monthly data for expenses and incomes
+    monthly_expenses = db.get_monthly_expenses(current_user.id)
+    monthly_incomes = db.get_monthly_incomes(current_user.id)
+
+    # Convert to lists to avoid serialization issues
+    months_expenses = [row[0] for row in monthly_expenses] if monthly_expenses else []
+    expense_values = [row[1] for row in monthly_expenses] if monthly_expenses else []
+    months_incomes = [row[0] for row in monthly_incomes] if monthly_incomes else []
+    income_values = [row[1] for row in monthly_incomes] if monthly_incomes else []
 
     # Fetch categorized expenses
     categorized_expenses = db.get_expenses_grouped_by_category(current_user.id)
-    categories = list(categorized_expenses.keys())
-    expenses_by_category = list(categorized_expenses.values())
+    categories = list(categorized_expenses.keys()) if categorized_expenses else []
+    expenses_by_category = list(categorized_expenses.values()) if categorized_expenses else []
 
-    # Render the analytics page with both datasets
+    # Calculate savings
+    savings = [income - expense for income, expense in zip(income_values, expense_values)]
+
+    # Render the analytics page with datasets
     return render_template(
         'analytics.html',
-        expenses=expenses,
-        incomes=incomes,
+        months_expenses=months_expenses,
+        expense_values=expense_values,
+        months_incomes=months_incomes,
+        income_values=income_values,
         categories=categories,
-        categorized_expenses=expenses_by_category
+        expenses_by_category=expenses_by_category,
+        savings=savings
     )
+
 # Financial Advice
 @app.route('/advice')
 @login_required
 def advice():
+    # Calculate total expenses and income
     total_expenses = sum([e[1] for e in db.get_all_expenses(current_user.id)])
     total_income = sum([i[1] for i in db.get_all_incomes(current_user.id)])
-    advice_message = (
-        "You're doing great! Keep it up!" if total_income > total_expenses
-        else "Your expenses are higher than your income. Consider budgeting!"
+    
+    # Calculate savings
+    savings = total_income - total_expenses
+
+    # Generate advice message
+    advice_message = []
+    if total_income > total_expenses:
+        advice_message.append("DK says You're doing great! Keep it up!")
+    else:
+        advice_message.append("DK say Your expenses are higher than your income. Consider budgeting!")
+    
+    if savings > 0.2 * total_income:
+        advice_message.append("DK says Great job! You're saving more than 20% of your income. Consider investing your savings.")
+
+    return render_template(
+        'advice.html', 
+        advice=advice_message, 
+        total_income=total_income, 
+        total_expenses=total_expenses, 
+        savings=savings  # Pass savings to the template
     )
-    return render_template('advice.html', advice=advice_message, total_income=total_income, total_expenses=total_expenses)
+
 
 #expense_summary
 @app.route('/expense_summary')
@@ -244,6 +275,58 @@ def expense_summary():
     
     # Render the summary template
     return render_template('expense_summary.html', grouped_expenses=grouped_expenses)
+
+@app.route('/add_recurring', methods=['POST'])
+@login_required
+def add_recurring_transaction():
+    amount = request.form['amount']
+    category = request.form['category']
+    frequency = request.form['frequency']
+    transaction_type = request.form['transaction_type']
+    next_due_date = request.form['next_due_date']
+
+    if not amount or not frequency or not transaction_type or not next_due_date:
+        flash("All fields are required for recurring transactions!", "danger")
+        return redirect(url_for('index'))
+
+    db.insert_recurring_transaction(
+        current_user.id, float(amount), category, frequency, next_due_date, transaction_type
+    )
+    flash(f"Recurring {transaction_type} added successfully!", "success")
+    return redirect(url_for('index'))
+
+@app.route('/recurring_transactions')
+@login_required
+def view_recurring_transactions():
+    transactions = db.get_recurring_transactions(current_user.id)
+    return render_template('recurring_transactions.html', transactions=transactions)
+
+@app.route('/delete_recurring/<int:transaction_id>', methods=['GET'])
+@login_required
+def delete_recurring_transaction(transaction_id):
+    db.delete_recurring_transaction(transaction_id)
+    flash("Recurring transaction deleted successfully!", "success")
+    return redirect(url_for('recurring_transactions'))
+
+@app.route('/edit_recurring/<int:transaction_id>', methods=['GET', 'POST'])
+@login_required
+def edit_recurring_transaction(transaction_id):
+    if request.method == 'POST':
+        # Fetch form data
+        amount = request.form['amount']
+        category = request.form['category']
+        frequency = request.form['frequency']
+        next_due_date = request.form['next_due_date']
+        transaction_type = request.form['transaction_type']
+
+        # Update the recurring transaction
+        db.update_recurring_transaction(transaction_id, amount, category, frequency, next_due_date, transaction_type)
+        flash("Recurring transaction updated successfully!", "success")
+        return redirect(url_for('recurring_transactions'))
+
+    # Fetch the existing transaction details
+    transaction = db.get_recurring_transaction(transaction_id)
+    return render_template('edit_recurring.html', transaction=transaction)
 
 
 

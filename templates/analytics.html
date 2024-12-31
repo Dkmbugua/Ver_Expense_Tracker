@@ -4,6 +4,13 @@
     <title>Analytics</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        h1 {
+            margin-top: 20px;
+        }
         .charts-container {
             display: flex;
             justify-content: space-around;
@@ -12,63 +19,86 @@
         }
         .chart {
             width: 45%;
+            margin: 20px auto;
         }
     </style>
 </head>
 <body>
-    <h1>Financial Analytics</h1>
+    <h1>Financial Analytics Dashboard</h1>
 
-    <!-- Container for the two charts -->
-    <div class="charts-container">
-        <!-- Chart for Expenses vs Incomes -->
-        <div id="chart-total" class="chart"></div>
+    <!-- Pie Chart for Expense Distribution -->
+    <div id="pie-chart" class="chart"></div>
 
-        <!-- Chart for Expenses by Category -->
-        <div id="chart-categories" class="chart"></div>
-    </div>
+    <!-- Bar Chart for Income vs Expenses -->
+    <div id="bar-chart" class="chart"></div>
+
+    <!-- Line Chart for Savings Growth -->
+    <div id="line-chart" class="chart"></div>
+
+    <a href="/">Back to Home</a>
 
     <!-- Script for the Charts -->
     <script>
-        // Data for the Total Expenses vs Incomes Chart
-        var expenses = {{ expenses | tojson }};
-        var incomes = {{ incomes | tojson }};
+        // Data for Pie Chart (Expense Distribution)
+        var pieData = [{
+            labels: {{ categories | default([]) | tojson }},
+            values: {{ expenses_by_category | default([]) | tojson }},
+            type: 'pie',
+            hole: 0.4,
+            textinfo: 'label+percent',
+            hoverinfo: 'label+value'
+        }];
 
-        var totalData = [
-            { x: Array.from(Array(expenses.length).keys()), y: expenses, type: 'bar', name: 'Expenses' },
-            { x: Array.from(Array(incomes.length).keys()), y: incomes, type: 'bar', name: 'Incomes' }
-        ];
-
-        var totalLayout = {
-            title: 'Expenses and Incomes',
-            xaxis: { title: 'Entries' },
-            yaxis: { title: 'Amount' }
+        var pieLayout = {
+            title: 'Expense Distribution by Category',
         };
 
-        Plotly.newPlot('chart-total', totalData, totalLayout);
+        Plotly.newPlot('pie-chart', pieData, pieLayout);
 
-        // Data for the Expenses by Category Chart
-        var categories = {{ categories | tojson }};
-        var categoryExpenses = {{ categorized_expenses | tojson }};
-
-        var categoryData = [
+        // Data for Bar Chart (Income vs Expenses)
+        var barData = [
             {
-                x: categories,
-                y: categoryExpenses,
+                x: {{ months_expenses | default([]) | tojson }},
+                y: {{ expense_values | default([]) | tojson }},
+                name: 'Expenses',
                 type: 'bar',
-                marker: { color: 'rgba(55, 128, 191, 0.6)' },
-                name: 'Expenses by Category'
+                marker: { color: 'rgba(222, 45, 38, 0.8)' }
+            },
+            {
+                x: {{ months_incomes | default([]) | tojson }},
+                y: {{ income_values | default([]) | tojson }},
+                name: 'Incomes',
+                type: 'bar',
+                marker: { color: 'rgba(55, 128, 191, 0.8)' }
             }
         ];
 
-        var categoryLayout = {
-            title: 'Expenses by Category',
-            xaxis: { title: 'Category' },
+        var barLayout = {
+            title: 'Monthly Income vs Expenses',
+            barmode: 'group',
+            xaxis: { title: 'Months' },
             yaxis: { title: 'Amount' }
         };
 
-        Plotly.newPlot('chart-categories', categoryData, categoryLayout);
-    </script>
+        Plotly.newPlot('bar-chart', barData, barLayout);
 
-    <a href="/">Back to Home</a>
+        // Data for Line Chart (Savings Growth)
+        var lineData = [{
+            x: {{ months_expenses | default([]) | tojson }},
+            y: {{ savings | default([]) | tojson }},
+            type: 'scatter',
+            mode: 'lines+markers',
+            line: { shape: 'spline', color: 'green' },
+            name: 'Savings'
+        }];
+
+        var lineLayout = {
+            title: 'Savings Growth Over Time',
+            xaxis: { title: 'Months' },
+            yaxis: { title: 'Savings (Amount)' }
+        };
+
+        Plotly.newPlot('line-chart', lineData, lineLayout);
+    </script>
 </body>
 </html>

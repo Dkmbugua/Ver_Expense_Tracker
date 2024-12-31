@@ -29,7 +29,6 @@ def create_tables():
         )
     ''')
 
-
     # Incomes table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS incomes (
@@ -40,23 +39,38 @@ def create_tables():
             FOREIGN KEY (user_id) REFERENCES users(id)
         )
     ''')
-    # Add the category column to the expenses table
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS expenses (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        amount REAL NOT NULL,
-        category TEXT NOT NULL DEFAULT 'Other',
-        user_id INTEGER NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-    )
-''')
 
+    # Expenses table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS expenses (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            amount REAL NOT NULL,
+            category TEXT NOT NULL DEFAULT 'Other',
+            user_id INTEGER NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    ''')
+
+    # Recurring transactions table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS recurring_transactions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            amount REAL NOT NULL,
+            category TEXT NOT NULL DEFAULT 'Other',
+            frequency TEXT NOT NULL, -- e.g., "Daily", "Weekly", "Monthly"
+            next_due_date DATE NOT NULL, -- Date of the next transaction
+            transaction_type TEXT NOT NULL, -- "Expense" or "Income"
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    ''')
 
     conn.commit()
     conn.close()
 
-# Fetch a user by username
+# User operations
 def get_user_by_username(username):
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
@@ -65,7 +79,6 @@ def get_user_by_username(username):
     conn.close()
     return user
 
-# Fetch a user by ID
 def get_user_by_id(user_id):
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
@@ -74,7 +87,6 @@ def get_user_by_id(user_id):
     conn.close()
     return user
 
-# Register a new user
 def register_user(username, password):
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
@@ -88,11 +100,10 @@ def register_user(username, password):
     finally:
         conn.close()
 
-# Verify a user's password
 def verify_password(stored_password, provided_password):
     return check_password_hash(stored_password, provided_password)
 
-# Profile CRUD operations
+# Profile operations
 def insert_profile(user_id, name, age, profession):
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
@@ -121,7 +132,7 @@ def update_profile(user_id, name, age, profession):
     conn.commit()
     conn.close()
 
-# CRUD operations for expenses
+# Expense operations
 def insert_expense(amount, user_id, category='Uncategorized'):
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
@@ -137,14 +148,6 @@ def get_all_expenses(user_id):
     conn.close()
     return expenses
 
-def get_expense(expense_id):
-    conn = sqlite3.connect(DB_NAME)
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM expenses WHERE id = ?", (expense_id,))
-    expense = cursor.fetchone()
-    conn.close()
-    return expense
-
 def update_expense(expense_id, amount):
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
@@ -159,7 +162,7 @@ def delete_expense(expense_id):
     conn.commit()
     conn.close()
 
-# CRUD operations for incomes
+# Income operations
 def insert_income(amount, user_id):
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
@@ -210,11 +213,102 @@ def get_expenses_grouped_by_category(user_id):
         GROUP BY category
     """, (user_id,))
 
-    grouped_expenses = cursor.fetchall()
+    result = dict(cursor.fetchall())
+    conn.close()
+    return result
+
+# Recurring transactions
+def insert_recurring_transaction(user_id, amount, category, frequency, next_due_date, transaction_type):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO recurring_transactions (user_id, amount, category, frequency, next_due_date, transaction_type)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (user_id, amount, category, frequency, next_due_date, transaction_type))
+    conn.commit()
     conn.close()
 
-    # Convert the result into a dictionary {category: total_amount}
-    return {row[0]: row[1] for row in grouped_expenses}
+def delete_recurring_transaction(transaction_id):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM recurring_transactions WHERE id = ?", (transaction_id,))
+    conn.commit()
+    conn.close()
+
+def update_recurring_transaction(transaction_id, amount, category, frequency, next_due_date, transaction_type):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE recurring_transactions
+        SET amount = ?, category = ?, frequency = ?, next_due_date = ?, transaction_type = ?
+        WHERE id = ?
+    """, (amount, category, frequency, next_due_date, transaction_type, transaction_id))
+    conn.commit()
+    conn.close()
+
+
+
+def get_recurring_transactions(user_id):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM recurring_transactions WHERE user_id = ?", (user_id,))
+    transactions = cursor.fetchall()
+    conn.close()
+    return transactions
+
+def get_due_recurring_transactions(today_date):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT * FROM recurring_transactions
+        WHERE next_due_date <= ?
+    """, (today_date,))
+    transactions = cursor.fetchall()
+    conn.close()
+    return transactions
+
+def update_next_due_date(transaction_id, new_due_date):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE recurring_transactions SET next_due_date = ? WHERE id = ?
+    """, (new_due_date, transaction_id))
+    conn.commit()
+    conn.close()
+
+# Fetch monthly expenses grouped by month
+def get_monthly_expenses(user_id):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT strftime('%Y-%m', created_at) AS month, SUM(amount)
+        FROM expenses
+        WHERE user_id = ?
+        GROUP BY strftime('%Y-%m', created_at)
+        ORDER BY strftime('%Y-%m', created_at)
+    """, (user_id,))
+
+    monthly_expenses = cursor.fetchall()
+    conn.close()
+    return monthly_expenses
+
+# Fetch monthly incomes grouped by month
+def get_monthly_incomes(user_id):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT strftime('%Y-%m', created_at) AS month, SUM(amount)
+        FROM incomes
+        WHERE user_id = ?
+        GROUP BY strftime('%Y-%m', created_at)
+        ORDER BY strftime('%Y-%m', created_at)
+    """, (user_id,))
+
+    monthly_incomes = cursor.fetchall()
+    conn.close()
+    return monthly_incomes
 
 
 if __name__ == "__main__":

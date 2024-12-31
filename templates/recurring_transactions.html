@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Recurring Transactions</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h1>Recurring Transactions</h1>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <p class="{{ category }}">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <table>
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Frequency</th>
+                <th>Next Due Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in transactions %}
+            <tr>
+                <td>{{ transaction[6] }}</td> <!-- Transaction Type -->
+                <td>{{ transaction[1] }}</td> <!-- Amount -->
+                <td>{{ transaction[2] }}</td> <!-- Category -->
+                <td>{{ transaction[4] }}</td> <!-- Frequency -->
+                <td>{{ transaction[5] }}</td> <!-- Next Due Date -->
+                <td>
+                    <!-- Edit or Delete buttons -->
+                    <a href="/edit_recurring/{{ transaction[0] }}"><button>Edit</button></a>
+                    <a href="/delete_recurring/{{ transaction[0] }}"><button>Delete</button></a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="/"><button>Back to Home</button></a>
+</body>
+</html>

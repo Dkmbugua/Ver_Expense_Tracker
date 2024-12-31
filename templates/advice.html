@@ -2,12 +2,66 @@
 <html>
 <head>
     <title>Financial Advice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .advice-container {
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #fff;
+            max-width: 600px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: #f4f4f4;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        li span {
+            font-weight: bold;
+            color: #007bff;
+        }
+        a {
+            display: block;
+            text-align: center;
+            margin: 20px auto;
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
     <h1>Financial Advice</h1>
-    <p>{{ advice }}</p>
-    <p>Total Income: {{ total_income }}</p>
-    <p>Total Expenses: {{ total_expenses }}</p>
+    <div class="advice-container">
+        <h2>Your Financial Summary</h2>
+        <p><span>Total Income:</span> KSh {{ "%.2f"|format(total_income) }}</p>
+        <p><span>Total Expenses:</span> KSh {{ "%.2f"|format(total_expenses) }}</p>
+        <p><span>Savings:</span> KSh {{ "%.2f"|format(savings) }}</p>
+
+        <h2>DK Software Advice</h2>
+        <ul>
+            {% for msg in advice %}
+            <li>{{ msg }}</li>
+            {% endfor %}
+        </ul>
+    </div>
     <a href="/">Back to Home</a>
 </body>
 </html>
