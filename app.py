@@ -134,7 +134,7 @@ def add_expense():
         return redirect(url_for('index'))
     db.insert_expense(float(amount), current_user.id, category)
     flash(f"Expense added successfully under '{category}'!", "success")
-    return redirect(url_for('analytics'))
+    return redirect(url_for('index'))
 
 @app.route('/add_income', methods=['POST'])
 @login_required
