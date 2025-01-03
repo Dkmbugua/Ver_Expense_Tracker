@@ -25,25 +25,35 @@
             padding: 20px;
         }
         .chart {
-            flex: 1 1 30%; /* Ensures three charts per row with enough spacing */
+            flex: 1 1 30%; /* Default: three charts per row */
             max-width: 500px;
-            min-width: 400px; /* Ensures the charts are not too small */
+            min-width: 400px; /* Ensures charts are not too small */
             margin: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle shadow for better visuals */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for visuals */
             border-radius: 10px; /* Rounded corners */
             background-color: #ffffff;
             padding: 15px; /* Padding inside each chart box */
         }
 
-        /* Responsive Design */
+        /* Medium screens (e.g., tablets) */
         @media (max-width: 1200px) {
             .chart {
                 flex: 1 1 45%; /* Two charts per row for medium screens */
             }
         }
+
+        /* Small screens (e.g., phones) */
         @media (max-width: 768px) {
+            .charts-container {
+                flex-direction: column; /* Stack charts vertically */
+            }
             .chart {
-                flex: 1 1 90%; /* Full-width charts for smaller screens */
+                flex: 1 1 90%; /* Full-width charts */
+                margin: 10px 0; /* Add vertical spacing */
+            }
+            h1 {
+                font-size: 24px; /* Adjust heading size */
+                margin: 15px 0;
             }
         }
     </style>
