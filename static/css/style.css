@@ -10,11 +10,13 @@ body {
 /* Header Styling */
 h1 {
     text-align: center;
-    color: #0056b3;
+    color: white;
     padding: 20px;
     margin: 0;
-    background-color: #e3f2fd;
+    background: linear-gradient(to right, #007bff, #0056b3);
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    font-size: 28px;
+    letter-spacing: 1px;
 }
 
 /* Section Headings */
@@ -62,11 +64,13 @@ button {
     margin: 5px 0;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);   
 }
 
 button:hover {
     background-color: #0056b3;
+    transform: scale(1.05);
 }
 
 button:disabled {
@@ -76,18 +80,19 @@ button:disabled {
 
 /* Forms */
 form input {
-    padding: 10px;
-    width: calc(100% - 22px); /* Adjust for padding and border */
-    margin-bottom: 10px;
+    padding: 12px;
+    width: 100%;
+    margin-bottom: 15px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    transition: all 0.3s ease;
+    box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 form input:focus {
     border-color: #007bff;
     outline: none;
-    box-shadow: 0px 0px 5px #007bff;
-}
+    box-shadow: 0px 0px 8px rgba(0, 123, 255, 0.5);
 
 /* Flash Messages */
 .flash-success {
@@ -97,6 +102,7 @@ form input:focus {
     margin-bottom: 10px;
     border: 1px solid #c3e6cb;
     border-radius: 5px;
+    animation: fade-in 0.5s ease;
 }
 
 .flash-danger {
@@ -106,4 +112,36 @@ form input:focus {
     margin-bottom: 10px;
     border: 1px solid #f5c6cb;
     border-radius: 5px;
+    animation: fade-in 0.5s ease;
+}
+
+/* Responsive Design for Small Screens */
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    h1, h2 {
+        font-size: 20px;
+        text-align: center;
+    }
+
+    table {
+        font-size: 12px;
+    }
+
+    table, th, td {
+        padding: 8px;
+    }
+
+    form input {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+    }
 }
