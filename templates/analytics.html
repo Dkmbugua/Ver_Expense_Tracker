@@ -21,24 +21,29 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 20px;
+            gap: 30px; /* Better spacing between charts */
             padding: 20px;
         }
         .chart {
-            flex: 1 1 40%;
-            max-width: 600px;
-            min-width: 300px;
+            flex: 1 1 30%; /* Ensures three charts per row with enough spacing */
+            max-width: 500px;
+            min-width: 400px; /* Ensures the charts are not too small */
             margin: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle shadow for better visuals */
+            border-radius: 10px; /* Rounded corners */
+            background-color: #ffffff;
+            padding: 15px; /* Padding inside each chart box */
         }
 
         /* Responsive Design */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 24px;
-            }
+        @media (max-width: 1200px) {
             .chart {
-                flex: 1 1 90%;
-                max-width: 90%;
+                flex: 1 1 45%; /* Two charts per row for medium screens */
+            }
+        }
+        @media (max-width: 768px) {
+            .chart {
+                flex: 1 1 90%; /* Full-width charts for smaller screens */
             }
         }
     </style>
@@ -71,14 +76,14 @@
             textinfo: 'label+percent',
             hoverinfo: 'label+value',
             marker: {
-                colors: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd']
+                colors: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
             }
         }];
 
         var pieLayout = {
             title: 'Expense Distribution by Category',
             height: 400,
-            width: 500,
+            width: 400,
         };
 
         Plotly.newPlot('pie-chart', pieData, pieLayout);
@@ -107,7 +112,7 @@
             xaxis: { title: 'Months' },
             yaxis: { title: 'Amount' },
             height: 400,
-            width: 700,
+            width: 500,
         };
 
         Plotly.newPlot('bar-chart', barData, barLayout);
@@ -127,7 +132,7 @@
             xaxis: { title: 'Months' },
             yaxis: { title: 'Savings (Amount)' },
             height: 400,
-            width: 700,
+            width: 500,
         };
 
         Plotly.newPlot('line-chart', lineData, lineLayout);
