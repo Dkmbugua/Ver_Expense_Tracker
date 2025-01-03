@@ -46,10 +46,13 @@
         @media (max-width: 768px) {
             .charts-container {
                 flex-direction: column; /* Stack charts vertically */
+                gap: 15px; /* Reduce spacing for small screens */
             }
             .chart {
-                flex: 1 1 90%; /* Full-width charts */
+                flex: 1 1 100%; /* Full-width charts */
                 margin: 10px 0; /* Add vertical spacing */
+                padding: 10px; /* Reduce padding */
+                max-width: 100%; /* Ensure it does not exceed the screen width */
             }
             h1 {
                 font-size: 24px; /* Adjust heading size */
@@ -77,6 +80,9 @@
 
     <!-- Chart Scripts -->
     <script>
+        // Check if the screen is small
+        var smallScreen = window.innerWidth <= 768;
+
         // Data for Pie Chart (Expense Distribution)
         var pieData = [{
             labels: {{ categories | default([]) | tojson }},
@@ -92,8 +98,8 @@
 
         var pieLayout = {
             title: 'Expense Distribution by Category',
-            height: 400,
-            width: 400,
+            height: smallScreen ? 300 : 400,
+            width: smallScreen ? 300 : 400, // Adjust for small screens
         };
 
         Plotly.newPlot('pie-chart', pieData, pieLayout);
@@ -121,8 +127,8 @@
             barmode: 'group',
             xaxis: { title: 'Months' },
             yaxis: { title: 'Amount' },
-            height: 400,
-            width: 500,
+            height: smallScreen ? 300 : 400,
+            width: smallScreen ? 350 : 500, // Adjust for small screens
         };
 
         Plotly.newPlot('bar-chart', barData, barLayout);
@@ -141,8 +147,8 @@
             title: 'Savings Growth Over Time',
             xaxis: { title: 'Months' },
             yaxis: { title: 'Savings (Amount)' },
-            height: 400,
-            width: 500,
+            height: smallScreen ? 300 : 400,
+            width: smallScreen ? 350 : 500, // Adjust for small screens
         };
 
         Plotly.newPlot('line-chart', lineData, lineLayout);
