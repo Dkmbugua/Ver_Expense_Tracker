@@ -78,3 +78,10 @@ Deployment
 The application can be deployed to a cloud hosting platform like Render or Railway.
 
 Deployed on Render
+
+Technologies Used
+Backend: Flask (Python)
+Frontend: HTML5, CSS3, JavaScript (with Plotly.js for visualizations)
+Database: SQLite for persistent data storage
+Authentication: Flask-Login for user session management
+Hosting: Render / Railway for deployment
