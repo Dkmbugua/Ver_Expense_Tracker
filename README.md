@@ -38,3 +38,43 @@ Fully responsive and optimized for both small and large screens.
 ![Screenshot (240)](https://github.com/user-attachments/assets/00e8a5eb-6c7e-49d6-b46d-04b77212fd6f)
 
 ![Screenshot (241)](https://github.com/user-attachments/assets/11a60e57-675f-4828-bf37-76f47f280286)
+
+Installation and Setup
+Prerequisites
+Python 3.8+ installed on your system.
+A virtual environment tool like venv or virtualenv.
+Step-by-Step Setup
+Clone the Repository:
+
+bash
+Copy code
+git clone https://github.com/<your-username>/Var_Expense_Tracker.git
+cd Var_Expense_Tracker
+Set Up Virtual Environment:
+
+bash
+Copy code
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+Install Dependencies:
+
+bash
+Copy code
+pip install -r requirements.txt
+Initialize the Database:
+
+Create tables using the database schema defined in database.py. Run:
+bash
+Copy code
+python -c "import database as db; db.create_tables()"
+Verify that finance.db is created in your project directory.
+Run the Application:
+
+bash
+Copy code
+python app.py
+Access the website at https://ver-expense-tracker.onrender.com/
+Deployment
+The application can be deployed to a cloud hosting platform like Render or Railway.
+
+Deployed on Render
