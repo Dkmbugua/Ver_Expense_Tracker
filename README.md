@@ -14,3 +14,15 @@ Expense and Income Management:
 Add, edit, and delete expenses and incomes.
 Categorize expenses for better organization.
 ![Screenshot (237)](https://github.com/user-attachments/assets/a2c3167a-c137-4b54-972d-abbf117069b8)
+Recurring Transactions:
+
+Add recurring incomes and expenses with customizable frequencies.
+Edit or delete recurring transactions.
+Analytics Dashboard:
+
+Dynamic visualizations of expense distribution, monthly income vs. expenses, and savings growth.
+Supports bar, pie, and line charts for financial analytics.
+Financial Advice:
+
+Provides personalized advice based on savings and income-to-expense ratios.
+Encourages budgeting and investment strategies for better financial health.
