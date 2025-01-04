@@ -1,4 +1,4 @@
-Expense Tracker Application
+Expense Tracker Application link to website  https://ver-expense-tracker.onrender.com/
 
 An advanced, user-friendly web-based financial management application for tracking expenses, incomes, and savings while offering analytical insights and budgetary advice.
 
@@ -48,7 +48,7 @@ Clone the Repository:
 
 bash
 Copy code
-git clone https://github.com/<your-username>/Var_Expense_Tracker.git
+git clone https://github.com/Dkmbugua/Ver_Expense_Tracker.git
 cd Var_Expense_Tracker
 Set Up Virtual Environment:
 
