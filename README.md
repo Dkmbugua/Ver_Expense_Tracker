@@ -26,3 +26,5 @@ Financial Advice:
 
 Provides personalized advice based on savings and income-to-expense ratios.
 Encourages budgeting and investment strategies for better financial health.
+
+![Screenshot (238)](https://github.com/user-attachments/assets/feffc15e-ba48-44dd-bf87-bc26eb30f973)
