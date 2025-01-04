@@ -35,3 +35,4 @@ A categorized summary of all expenses for easy tracking.
 Responsive Design:
 
 Fully responsive and optimized for both small and large screens.
+![Screenshot (240)](https://github.com/user-attachments/assets/00e8a5eb-6c7e-49d6-b46d-04b77212fd6f)
