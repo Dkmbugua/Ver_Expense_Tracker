@@ -76,6 +76,8 @@ def logout():
     logout_user()
     flash("Logged out successfully!", "success")
     return redirect(url_for('login'))
+
+
 # Profile Management
 
 @app.route('/')  # Ensure this route is defined only once
@@ -196,6 +198,8 @@ def delete_income(income_id):
     db.delete_income(income_id)
     flash("Income deleted successfully!", "success")
     return redirect(url_for('index'))
+
+
 #finance Analytics
 @app.route('/analytics')
 @login_required
@@ -276,6 +280,7 @@ def expense_summary():
     # Render the summary template
     return render_template('expense_summary.html', grouped_expenses=grouped_expenses)
 
+#route for recurring expenses and income
 @app.route('/add_recurring', methods=['POST'])
 @login_required
 def add_recurring_transaction():
